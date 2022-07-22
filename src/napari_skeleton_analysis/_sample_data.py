@@ -1,21 +1,40 @@
-"""
-This module is an example of a barebones sample data provider for napari.
-
-It implements the "sample data" specification.
-see: https://napari.org/stable/plugins/guides.html?#sample-data
-
-Replace code below according to your needs.
-"""
-from __future__ import annotations
-
-import numpy
 
 
-def make_sample_data():
-    """Generates an image"""
-    # Return list of tuples
-    # [(data1, add_image_kwargs1), (data2, add_image_kwargs2)]
-    # Check the documentation for more information about the
-    # add_image_kwargs
-    # https://napari.org/stable/api/napari.Viewer.html#napari.Viewer.add_image
-    return [(numpy.random.rand(512, 512), {})]
+def retina():
+    import numpy as np
+    image = np.asarray([
+
+    ])
+
+    from pathlib import Path
+
+    from skimage.io import imread
+    return [(imread(Path(__file__).parent / "600px-Fundus_photograph_of_normal_right_eye.jpg"), {})]
+    # Image data source: https://commons.wikimedia.org/wiki/File:Fundus_photograph_of_normal_right_eye.jpg
+    # CC0
+    #
+    # Häggström, Mikael (2014). "Medical gallery of Mikael Häggström 2014". WikiJournal of Medicine 1 (2). DOI:10.15347/wjm/2014.008. ISSN 2002-4436. Public Domain.
+
+
+def retina_binary():
+    import numpy as np
+    image = np.asarray([
+
+    ])
+
+    from pathlib import Path
+
+    from skimage.io import imread
+    return [(imread(Path(__file__).parent / "600px-Fundus_photograph_of_normal_right_eye_binarized.tif"), {}, 'labels')]
+
+
+def retina_skeleton():
+    import numpy as np
+    image = np.asarray([
+
+    ])
+
+    from pathlib import Path
+
+    from skimage.io import imread
+    return [(imread(Path(__file__).parent / "600px-Fundus_photograph_of_normal_right_eye_skeletonized.tif"), {}, 'labels')]

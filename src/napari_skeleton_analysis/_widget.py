@@ -1,46 +1,115 @@
-"""
-This module is an example of a barebones QWidget plugin for napari
 
-It implements the Widget specification.
-see: https://napari.org/stable/plugins/guides.html?#widgets
+import numpy as np
+from napari_tools_menu import register_function
 
-Replace code below according to your needs.
-"""
-from typing import TYPE_CHECKING
-
-from magicgui import magic_factory
-from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget
-
-if TYPE_CHECKING:
-    import napari
+@register_function(menu="Segmentation post-processing > Skeletonize (scikit-image, n-skan)")
+def skeletonize(binary_image:"napari.types.LabelsData") -> "napari.types.LabelsData":
+    from skimage import morphology
+    skeleton = morphology.skeletonize(binary_image)
+    return skeleton
 
 
-class ExampleQWidget(QWidget):
-    # your QWidget.__init__ can optionally request the napari viewer instance
-    # in one of two ways:
-    # 1. use a parameter called `napari_viewer`, as done here
-    # 2. use a type annotation of 'napari.viewer.Viewer' for any parameter
-    def __init__(self, napari_viewer):
-        super().__init__()
-        self.viewer = napari_viewer
-
-        btn = QPushButton("Click me!")
-        btn.clicked.connect(self._on_click)
-
-        self.setLayout(QHBoxLayout())
-        self.layout().addWidget(btn)
-
-    def _on_click(self):
-        print("napari has", len(self.viewer.layers), "layers")
+@register_function(menu="Segmentation post-processing > Skeleton image (n-skan)")
+def skeleton_image(binary_image:"napari.types.LabelsData") -> "napari.types.LabelsData":
+    skeleton = _image_to_skeleton(binary_image)
+    return skeleton.skeleton_image
 
 
-@magic_factory
-def example_magic_widget(img_layer: "napari.layers.Image"):
-    print(f"you have selected {img_layer}")
+@register_function(menu="Segmentation post-processing > Skeleton path image (n-skan)")
+def path_label_image(binary_image: "napari.types.LabelsData") -> "napari.types.LabelsData":
+    skeleton = _image_to_skeleton(binary_image)
+    return skeleton.path_label_image()
 
 
-# Uses the `autogenerate: true` flag in the plugin manifest
-# to indicate it should be wrapped as a magicgui to autogenerate
-# a widget.
-def example_function_widget(img_layer: "napari.layers.Image"):
-    print(f"you have selected {img_layer}")
+@register_function(menu="Measurement > Skeleton path length image (n-skan)")
+def path_length_image(binary_image: "napari.types.LabelsData") -> "napari.types.ImageData":
+    from napari_skimage_regionprops import relabel
+    skeleton = _image_to_skeleton(binary_image)
+    path_image = skeleton.path_label_image()
+    path_lengths = skeleton.path_lengths()
+    return relabel(path_image, path_lengths.tolist())
+
+
+@register_function(menu="Measurement > Skeleton branch statistics (n-skan)")
+def branch_statistics(binary_image: "napari.types.LabelsData", napari_viewer:"napari.Viewer" = None) -> "pandas.DataFrame":
+    import skan
+    skeleton = _image_to_skeleton(binary_image)
+    results = skan.summarize(skeleton)
+
+    if napari_viewer is not None:
+        from napari_workflows._workflow import _get_layer_from_data
+        labels_layer = _get_layer_from_data(napari_viewer, binary_image)
+        # Store results in the properties dictionary:
+        labels_layer.properties = results
+
+        # turn table into a widget
+        from napari_skimage_regionprops import add_table
+        add_table(labels_layer, napari_viewer)
+    else:
+        import pandas
+        return pandas.DataFrame(results)
+
+
+@register_function(menu="Measurement > Skeleton branch lines (n-skan)")
+def branch_lines(binary_image: "napari.types.LabelsData", edge_width: float = 0.1) -> "napari.types.LayerDataTuple":
+    return _make_branch_lines(binary_image, edge_width, "plain")
+
+
+@register_function(menu="Measurement > Skeleton branch type lines (n-skan)")
+def branch_type_lines(binary_image: "napari.types.LabelsData",
+                      edge_width: float = 0.1) -> "napari.types.LayerDataTuple":
+    return _make_branch_lines(binary_image, edge_width, "branch_type")
+
+
+@register_function(menu="Measurement > Skeleton degree image (n-skan)")
+def degree_image(binary_image:"napari.types.LabelsData") -> "napari.types.ImageData":
+    import skan
+    return skan.csr.make_degree_image(binary_image)
+
+
+
+branch_type_colors = [
+    [0, 1, 0, 1],
+    [1, 0, 1, 1],
+    [0, 1, 1, 1],
+    [1, 0.5, 0, 1],
+]
+
+
+def _make_branch_lines(binary_image: "napari.types.LabelsData", edge_width: float = 0.1,
+                       line_color_type='plain') -> "napari.types.LayerDataTuple":
+    stats = branch_statistics(binary_image)
+
+    all_coords = []
+    all_shape_type = []
+    all_edge_width = []
+    all_edge_colors = []
+
+    is_3d = "image-coord-src-2" in stats.keys()
+    for s in stats.index:
+        if not is_3d:
+            start = [stats["coord-src-0"][s], stats["coord-src-1"][s]]
+            stop = [stats["coord-dst-0"][s], stats["coord-dst-1"][s]]
+        else:
+            start = [stats["coord-src-0"][s], stats["coord-src-1"][s], stats["coord-src-2"][s]]
+            stop = [stats["coord-dst-0"][s], stats["coord-dst-1"][s], stats["coord-dst-2"][s]]
+
+        coords = [start, stop]
+        all_coords.append(coords)
+        all_shape_type.append("line")
+        all_edge_width.append(edge_width)
+
+        if line_color_type == 'plain':
+            all_edge_colors.append([1, 1, 1])
+        elif line_color_type == 'branch_type':
+            all_edge_colors.append(branch_type_colors[stats["branch-type"][s]])
+
+    return (
+    np.asarray(all_coords), {'shape_type': all_shape_type, 'edge_width': all_edge_width, 'edge_color': all_edge_colors},
+    'shapes')
+
+
+def _image_to_skeleton(skeleton_image:"napari.types.LabelsData") -> "skan.Skeleton":
+    import skan
+    return skan.Skeleton(skeleton_image)
+

@@ -2,22 +2,25 @@ name: napari-skeleton-analysis
 display_name: Skeleton Analysis
 contributions:
   commands:
-    - id: napari-skeleton-analysis.make_sample_data
-      python_name: napari_skeleton_analysis._sample_data:make_sample_data
-      title: Load sample data from Skeleton Analysis
-    - id: napari-skeleton-analysis.make_qwidget
-      python_name: napari_skeleton_analysis._widget:ExampleQWidget
-      title: Make example QWidget
-    - id: napari-skeleton-analysis.make_magic_widget
-      python_name: napari_skeleton_analysis._widget:example_magic_widget
-      title: Make example magic widget
-    - id: napari-skeleton-analysis.make_func_widget
-      python_name: napari_skeleton_analysis._widget:example_function_widget
-      title: Make example function widget
+    - id: napari-skeleton-analysis.retina
+      python_name: napari_skeleton_analysis._sample_data:retina
+      title: Retina
+    - id: napari-skeleton-analysis.retina_binary
+      python_name: napari_skeleton_analysis._sample_data:retina_binary
+      title: Retina binary
+    - id: napari-skeleton-analysis.retina_skeleton
+      python_name: napari_skeleton_analysis._sample_data:retina_skeleton
+      title: Retina skeleton
   sample_data:
-    - command: napari-skeleton-analysis.make_sample_data
-      display_name: Skeleton Analysis
+    - command: napari-skeleton-analysis.retina
+      display_name: Retina
       key: unique_id.1
+    - command: napari-skeleton-analysis.retina_binary
+      display_name: Retina binary
+      key: unique_id.2
+    - command: napari-skeleton-analysis.retina_skeleton
+      display_name: Retina skeleton
+      key: unique_id.3
   widgets:
     - command: napari-skeleton-analysis.make_qwidget
       display_name: Example QWidget
