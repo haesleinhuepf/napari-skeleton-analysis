@@ -17,13 +17,15 @@ This [napari] plugin was generated with [Cookiecutter] using [@napari]'s [cookie
 
 ## Installation
 
-You can install <!--`napari-skeleton-analysis` via [pip]:
+You can install 
+<!--`napari-skeleton-analysis` via [pip]:
 
     pip install napari-skeleton-analysis
 
 
 
-To install--> latest development version :
+To install--> 
+latest development version :
 
     pip install git+https://github.com/haesleinhuepf/napari-skeleton-analysis.git
 
