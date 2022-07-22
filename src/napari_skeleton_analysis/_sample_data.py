@@ -1,14 +1,8 @@
-
+import numpy as np
+from pathlib import Path
+from skimage.io import imread
 
 def retina():
-    import numpy as np
-    image = np.asarray([
-
-    ])
-
-    from pathlib import Path
-
-    from skimage.io import imread
     return [(imread(Path(__file__).parent / "600px-Fundus_photograph_of_normal_right_eye.jpg"), {})]
     # Image data source: https://commons.wikimedia.org/wiki/File:Fundus_photograph_of_normal_right_eye.jpg
     # CC0
@@ -17,24 +11,8 @@ def retina():
 
 
 def retina_binary():
-    import numpy as np
-    image = np.asarray([
-
-    ])
-
-    from pathlib import Path
-
-    from skimage.io import imread
     return [(imread(Path(__file__).parent / "600px-Fundus_photograph_of_normal_right_eye_binarized.tif"), {}, 'labels')]
 
 
 def retina_skeleton():
-    import numpy as np
-    image = np.asarray([
-
-    ])
-
-    from pathlib import Path
-
-    from skimage.io import imread
     return [(imread(Path(__file__).parent / "600px-Fundus_photograph_of_normal_right_eye_skeletonized.tif"), {}, 'labels')]
