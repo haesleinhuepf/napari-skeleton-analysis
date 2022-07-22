@@ -7,7 +7,7 @@
 [![codecov](https://codecov.io/gh/haesleinhuepf/napari-skeleton-analysis/branch/main/graph/badge.svg)](https://codecov.io/gh/haesleinhuepf/napari-skeleton-analysis)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-skeleton-analysis)](https://napari-hub.org/plugins/napari-skeleton-analysis)
 
-Analyze skeleton images in napari using skan
+Analyze skeleton images in napari using [skan](https://github.com/jni/skan)
 
 ![img.png](docs/screenshot.png)
 
