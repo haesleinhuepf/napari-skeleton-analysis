@@ -30,6 +30,12 @@ latest development version :
     pip install git+https://github.com/haesleinhuepf/napari-skeleton-analysis.git
 
 
+## Related plugins
+
+There are related napari plugins with similar functionality:
+* [napari-skeleton-curator](https://github.com/kevinyamauchi/napari-skeleton-curator)
+* [skeleton-finder](https://www.napari-hub.org/plugins/skeleton-finder)
+
 ## Contributing
 
 Contributions are very welcome. Tests can be run with [tox], please ensure
